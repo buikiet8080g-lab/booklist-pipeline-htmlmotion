@@ -1,0 +1,18 @@
+{
+ "voice": "茉莉",
+ "program_name": "family-moli-reflective-seeding-v1",
+ "chars": 108,
+ "segments": [
+  {
+   "id": "001",
+   "chars": 104,
+   "wav": "metadata/04-voice/001.wav",
+   "seconds": 9.0,
+   "duration": 25.6,
+   "text": "很多父母以为，不吼孩子靠的是忍住。可你忍住的那股劲，孩子其实感受得到。《被讨厌的勇气》里说：把孩子的课题还给孩子。你能做的只有三件事：先看见情绪，再说明规则，最后给他选择。这本书我放在橱窗了，想读的点开看看。"
+  }
+ ],
+ "duration_seconds": 25.6,
+ "output": "/root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/audio/main-voice.wav",
+ "style": "角色：普通妈妈型读书分享者，读家庭教育书有真实触动的人。场景：在家对着手机跟另一位妈妈说话。指导：真诚、温和、有分享欲；语速中速；第一句清楚有气口。禁用：播音腔、老师腔、卖课腔、喊麦、哭腔。"
+}

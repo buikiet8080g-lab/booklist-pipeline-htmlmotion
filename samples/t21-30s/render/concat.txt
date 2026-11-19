@@ -1,0 +1,5 @@
+file '/root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/clips/001-1.mp4'
+file '/root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/clips/002-1.mp4'
+file '/root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/clips/003-1.mp4'
+file '/root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/clips/004-1.mp4'
+file '/root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/clips/005-1.mp4'

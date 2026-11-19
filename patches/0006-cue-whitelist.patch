@@ -1,0 +1,113 @@
+diff --git a/scripts/engine/clip.js b/scripts/engine/clip.js
+index e0536da..ad7f1a7 100644
+--- a/scripts/engine/clip.js
++++ b/scripts/engine/clip.js
+@@ -51,6 +51,12 @@ async function boot() {
+   if (x.status !== 200) return fail(`没有这个语法：clips/${spec.grammar}.js（HTTP ${x.status}）`);
+   try { (0, eval)(x.responseText + `\n//# sourceURL=clips/${spec.grammar}.js`); } catch (e) { return fail(`clips/${spec.grammar}.js 执行出错 ${e.stack || e}`); }
+   const G = CLIPS[spec.grammar]; if (!G || typeof G.draw !== 'function') return fail(`clips/${spec.grammar}.js 没注册 CLIPS['${spec.grammar}'] = { draw }`);
++  // cue 白名单（P3）：写错 kind 以前会被静默丢掉——那一页不出现也不报错（实测给 y5 写 kind:"quote"，整页消失、audit 还报 0 红灯）。
++  // 语法声明了 kinds 的，未知 kind 一律启动失败：render.py 非零退出，lint_spec.py 同样红灯。
++  if (Array.isArray(G.kinds) && G.kinds.length) {
++    const bad = (spec.cues || []).filter(q => !G.kinds.includes(q.kind));
++    if (bad.length) return fail(`语法 ${spec.grammar} 不认识这些 cue：` + bad.map(q => `${q.kind}@${q.at}s`).join('、') + `\n这个语法允许的 kind：${G.kinds.join(' / ')}`);
++  }
+   // 主题色板：在加载素材之前核，写错就别白等图片
+   let pal = null;
+   if (!(G.legacyTheme && G.legacyTheme(spec.theme))) { try { pal = PAL.resolve(spec.theme); } catch (e) { return fail(e.message); } }
+diff --git a/scripts/engine/clips/t1_3b1b.js b/scripts/engine/clips/t1_3b1b.js
+index 4bc656b..95b092e 100644
+--- a/scripts/engine/clips/t1_3b1b.js
++++ b/scripts/engine/clips/t1_3b1b.js
+@@ -56,6 +56,7 @@ const titleLines = (c, text, maxW, size, maxLines) => {
+ let BUF;
+ return {
+   fonts: ['PuHui-Medium'],
++  kinds: ['title', 'point', 'equation', 'line', 'highlight'],                                                  // cue 白名单（clip.js 校验，见 patches/0006）
+   safe: true,
+   init(ctx) {
+     M = ctx.pal ? palMap(ctx.pal) : DG.MANIM; INK = ctx.pal ? ctx.pal.ink : '#fff'; DG.FONT.zh = 'PuHui-Medium';                         // 任意中文：普惠体（思源宋子集只有示范片用到的字）
+diff --git a/scripts/engine/clips/t2_keynote_ui.js b/scripts/engine/clips/t2_keynote_ui.js
+index 3a42271..012ea12 100644
+--- a/scripts/engine/clips/t2_keynote_ui.js
++++ b/scripts/engine/clips/t2_keynote_ui.js
+@@ -55,6 +55,7 @@ const fitB = (g, text, maxW, size, fam, o = {}) => TY.fit(g, text, maxW, size, f
+ const fmtNum = (d, k) => (d.prefix || '') + TY.fmt((+d.value || 0) * k, d.decimals ?? 0) + (d.suffix || '');
+ return {
+   fonts: ['PuHui-Medium', 'PuHui-Bold'],
++  kinds: ['title', 'card', 'step', 'image', 'highlight', 'number'],                                                  // cue 白名单（clip.js 校验，见 patches/0006）
+   safe: true,
+   init(ctx) {
+     const { W, H, u, safe } = ctx;
+diff --git a/scripts/engine/clips/t3_finance_chart.js b/scripts/engine/clips/t3_finance_chart.js
+index 67a3786..8e64667 100644
+--- a/scripts/engine/clips/t3_finance_chart.js
++++ b/scripts/engine/clips/t3_finance_chart.js
+@@ -41,6 +41,7 @@ let L, BUF;
+ const fmtv = (d, v) => (d.prefix || '') + TY.fmt(v, d.decimals ?? 1) + (d.suffix || '');
+ return {
+   fonts: ['PuHui-Medium', 'PuHui-Bold'],
++  kinds: ['title', 'bar', 'line', 'candle', 'highlight', 'number'],                                                  // cue 白名单（clip.js 校验，见 patches/0006）
+   safe: true,
+   legacyTheme: legacy,
+   init(ctx) {
+diff --git a/scripts/engine/clips/y1_kurzgesagt.js b/scripts/engine/clips/y1_kurzgesagt.js
+index c9d322f..3abd2f7 100644
+--- a/scripts/engine/clips/y1_kurzgesagt.js
++++ b/scripts/engine/clips/y1_kurzgesagt.js
+@@ -40,6 +40,7 @@ const dark = (col, k = 0.72) => PAINT.rgb(PAINT.hex(col).map(v => v * k)), light
+ let S, levels, flow;
+ return {
+   fonts: ['PuHui-Heavy', 'PuHui-Medium'],
++  kinds: ['title', 'point', 'enter', 'highlight'],                                                  // cue 白名单（clip.js 校验，见 patches/0006）
+   safe: true,
+   init(ctx) {
+     const { W, H, u, safe } = ctx, r = rng(11);
+diff --git a/scripts/engine/clips/y2_vox.js b/scripts/engine/clips/y2_vox.js
+index 784dbcc..821580a 100644
+--- a/scripts/engine/clips/y2_vox.js
++++ b/scripts/engine/clips/y2_vox.js
+@@ -22,6 +22,7 @@ let items, keys, strings;
+ const ls = (t, at) => MO.step(t - at + 1e-6, 12) + 1 / 12;
+ return {
+   fonts: ['PuHui-Heavy', 'PuHui-Bold'],
++  kinds: ['image', 'clip', 'title', 'point', 'highlight'],                                                  // cue 白名单（clip.js 校验，见 patches/0006）
+   safe: true,
+   init(ctx) {
+     const { W, H, u, portrait } = ctx, r = rng(7), g = document.createElement('canvas').getContext('2d');
+diff --git a/scripts/engine/clips/y3_whiteboard.js b/scripts/engine/clips/y3_whiteboard.js
+index 4c1c914..ad39773 100644
+--- a/scripts/engine/clips/y3_whiteboard.js
++++ b/scripts/engine/clips/y3_whiteboard.js
+@@ -158,6 +158,7 @@ function layout(ctx, f) {
+ }
+ return {
+   fonts: [FONT],
++  kinds: ['title', 'point', 'draw', 'image', 'highlight'],                                                  // cue 白名单（clip.js 校验，见 patches/0006）
+   safe: true,
+   init(ctx) {
+     const { W, H, u, safe } = ctx, p = ctx.pal;
+diff --git a/scripts/engine/clips/y4_storytime.js b/scripts/engine/clips/y4_storytime.js
+index 4d30c1f..768d473 100644
+--- a/scripts/engine/clips/y4_storytime.js
++++ b/scripts/engine/clips/y4_storytime.js
+@@ -40,6 +40,7 @@ const NEED_FRAMES = 'y4 需要角色帧库 data.character.frames（AI 生帧，
+ let keys, says, L, shots, FR, C = C0;
+ return {
+   fonts: ['PuHui-Bold', 'PuHui-Black'],
++  kinds: ['title', 'point', 'react', 'insert', 'highlight'],                                                  // cue 白名单（clip.js 校验，见 patches/0006）
+   safe: true,
+   init(ctx) {
+     const { W, H, u } = ctx, ch = ctx.data.character;
+diff --git a/scripts/engine/clips/y5_kinetic_type.js b/scripts/engine/clips/y5_kinetic_type.js
+index 23d421c..4ed8544 100644
+--- a/scripts/engine/clips/y5_kinetic_type.js
++++ b/scripts/engine/clips/y5_kinetic_type.js
+@@ -20,6 +20,7 @@ const accentOf = col => TP ? pick(col[0], col[1], [TP.accent, TP.accent2]) : col
+ const fromPal = p => { const txt = bg => PAL.on(bg, [p.surface, p.ink, p.bg]); return [[p.bg, p.ink], [p.accent, txt(p.accent)], [p.ink, p.bg], [p.accent2, txt(p.accent2)]]; };
+ return {
+   fonts: ['PuHui-Black', 'PuHui-Heavy', 'PuHui-Bold'],
++  kinds: ['title', 'point', 'number', 'highlight'],                                                  // cue 白名单（clip.js 校验，见 patches/0006）
+   safe: true,
+   init(ctx) {
+     TP = ctx.data.palette ? null : ctx.pal;

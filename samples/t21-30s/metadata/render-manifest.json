@@ -1,0 +1,102 @@
+{
+ "pipeline": "booklist-pipeline-htmlmotion",
+ "canvas": "720x1280@24",
+ "parallel": 3,
+ "rendered_at": "2026-10-30T01:13:45",
+ "total_seconds": 15.9,
+ "shot_count": 5,
+ "master": "/root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/render/master-noaudio.mp4",
+ "failed": [],
+ "shots": [
+  {
+   "id": "001-1",
+   "grammar": "bl_cover_hero",
+   "signature": "07f9838d764238e8",
+   "status": "ok",
+   "capture_seconds": 6.89,
+   "retries": 0,
+   "spec": "metadata/specs/001-1.json",
+   "error": "",
+   "ffprobe": {
+    "w": 720,
+    "h": 1280,
+    "fps": "24/1",
+    "frames": "110",
+    "duration": 4.583333
+   },
+   "sha256": "440610f3509921bc198d48f847b0f6bfccd124f50fb5293431b9aa8fa301ca42"
+  },
+  {
+   "id": "002-1",
+   "grammar": "y5_kinetic_type",
+   "signature": "8c6a4de39bed8596",
+   "status": "ok",
+   "capture_seconds": 6.42,
+   "retries": 0,
+   "spec": "metadata/specs/002-1.json",
+   "error": "",
+   "ffprobe": {
+    "w": 720,
+    "h": 1280,
+    "fps": "24/1",
+    "frames": "110",
+    "duration": 4.583333
+   },
+   "sha256": "85b2f99ec90b3b9cf1d35a88a5378dfa7cf25adcf7b039769984fd5eadf05f59"
+  },
+  {
+   "id": "003-1",
+   "grammar": "bl_quote",
+   "signature": "ce918beee421c1e6",
+   "status": "ok",
+   "capture_seconds": 6.93,
+   "retries": 0,
+   "spec": "metadata/specs/003-1.json",
+   "error": "",
+   "ffprobe": {
+    "w": 720,
+    "h": 1280,
+    "fps": "24/1",
+    "frames": "159",
+    "duration": 6.625
+   },
+   "sha256": "016e11c6115403a1934e015eb3490523e5ad337c833fb1fb4ddd83c46998024e"
+  },
+  {
+   "id": "004-1",
+   "grammar": "y5_kinetic_type",
+   "signature": "1830796b50176d87",
+   "status": "ok",
+   "capture_seconds": 5.21,
+   "retries": 0,
+   "spec": "metadata/specs/004-1.json",
+   "error": "",
+   "ffprobe": {
+    "w": 720,
+    "h": 1280,
+    "fps": "24/1",
+    "frames": "123",
+    "duration": 5.125
+   },
+   "sha256": "2e6422c604aede6cf0c10f98bd8e0d65f13e3b789168ae3b3622ebad7343e771"
+  },
+  {
+   "id": "005-1",
+   "grammar": "bl_cover_hero",
+   "signature": "07f9838d764238e8",
+   "status": "ok",
+   "capture_seconds": 5.23,
+   "retries": 0,
+   "spec": "metadata/specs/005-1.json",
+   "error": "",
+   "ffprobe": {
+    "w": 720,
+    "h": 1280,
+    "fps": "24/1",
+    "frames": "110",
+    "duration": 4.583333
+   },
+   "sha256": "440610f3509921bc198d48f847b0f6bfccd124f50fb5293431b9aa8fa301ca42"
+  }
+ ]
+}

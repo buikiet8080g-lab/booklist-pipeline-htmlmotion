@@ -1,0 +1,36 @@
+[
+ {
+  "grammar": "bl_cover_hero",
+  "text": "被讨厌的勇气",
+  "sub": "岸见一郎 / 古贺史健"
+ },
+ {
+  "grammar": "bl_quote",
+  "text": "把孩子的课题还给孩子",
+  "page": "第 88 页",
+  "key": "课题"
+ },
+ {
+  "grammar": "y5_kinetic_type",
+  "points": [
+   {
+    "text": "先看见情绪",
+    "sub": "说出他的感受"
+   },
+   {
+    "text": "再说明规则",
+    "sub": "一次只说一条"
+   },
+   {
+    "text": "最后给选择",
+    "sub": "两个都行，你选"
+   }
+  ]
+ },
+ {
+  "grammar": "bl_cover_hero",
+  "text": "被讨厌的勇气",
+  "sub": "橱窗在左下角",
+  "tag": "想读的点开"
+ }
+]

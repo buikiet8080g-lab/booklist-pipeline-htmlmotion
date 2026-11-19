@@ -1,0 +1,242 @@
+{
+ "pipeline": "booklist-pipeline-htmlmotion",
+ "pipeline_version": 1.2,
+ "render_engine": "huashu_grammar_vendor",
+ "canvas": "720x1280@24",
+ "shot_duration_default": "6-8s",
+ "shot_duration_long_max": "15s",
+ "shot_cut": "hard_cut",
+ "subtitle_safe_bottom_px": 300,
+ "grammar_whitelist": [
+  "bl_cover_hero",
+  "bl_quote",
+  "y5_kinetic_type",
+  "t3_finance_chart",
+  "y2_vox"
+ ],
+ "free_scene_max_ratio": 0.1,
+ "user_confirmation_points": 0,
+ "theme": "wood",
+ "account": "family-education-parent-reader",
+ "audio": "/root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/audio/main-voice.wav",
+ "audio_duration": 25.6,
+ "shot_count": 5,
+ "shots": [
+  {
+   "id": "001-1",
+   "start": 0.0,
+   "duration": 4.6,
+   "scene_type": "kit",
+   "grammar": "bl_cover_hero",
+   "spec": {
+    "cues": [
+     {
+      "at": 0.06,
+      "kind": "cover",
+      "image": "images/cover-demo.jpg",
+      "text": "被讨厌的勇气",
+      "sub": "岸见一郎 / 古贺史健",
+      "data": {
+       "tag": "豆瓣 8.6",
+       "press": "机械工业出版社"
+      }
+     }
+    ]
+   },
+   "narration_span": [
+    0.0,
+    4.6
+   ],
+   "subtitle_lines": [
+    "很多父母以为，不吼孩子靠的是忍住。"
+   ],
+   "book_cover_required": true,
+   "assets": [
+    {
+     "role": "book_cover",
+     "path": "images/cover-demo.jpg"
+    }
+   ],
+   "heavy_accent": false,
+   "_locked": false,
+   "theme": "wood",
+   "safe": {
+    "top": 80,
+    "bottom": 300
+   }
+  },
+  {
+   "id": "002-1",
+   "start": 4.6,
+   "duration": 4.6,
+   "scene_type": "kit",
+   "grammar": "y5_kinetic_type",
+   "spec": {
+    "cues": [
+     {
+      "at": 0.06,
+      "kind": "point",
+      "text": "可你忍住的那股劲",
+      "sub": ""
+     },
+     {
+      "at": 2.06,
+      "kind": "point",
+      "text": "孩子其实感受得到",
+      "sub": ""
+     },
+     {
+      "at": 3.26,
+      "kind": "highlight",
+      "data": {
+       "word": "孩子其实"
+      }
+     }
+    ]
+   },
+   "narration_span": [
+    4.6,
+    9.2
+   ],
+   "subtitle_lines": [
+    "可你忍住的那股劲，孩子其实感受得到。"
+   ],
+   "book_cover_required": false,
+   "assets": [],
+   "heavy_accent": false,
+   "_locked": false,
+   "theme": "wood",
+   "safe": {
+    "top": 80,
+    "bottom": 300
+   }
+  },
+  {
+   "id": "003-1",
+   "start": 9.2,
+   "duration": 6.64,
+   "scene_type": "kit",
+   "grammar": "bl_quote",
+   "spec": {
+    "cues": [
+     {
+      "at": 0.06,
+      "kind": "quote",
+      "text": "把孩子的课题还给孩子",
+      "data": {
+       "source": "《被讨厌的勇气》",
+       "author": "岸见一郎 / 古贺史健",
+       "page": "第 88 页",
+       "key": ""
+      }
+     }
+    ]
+   },
+   "narration_span": [
+    9.2,
+    15.84
+   ],
+   "subtitle_lines": [
+    "《被讨厌的勇气》里说：把孩子的课题还给孩子。"
+   ],
+   "book_cover_required": false,
+   "assets": [],
+   "heavy_accent": false,
+   "_locked": false,
+   "theme": "wood",
+   "safe": {
+    "top": 80,
+    "bottom": 300
+   }
+  },
+  {
+   "id": "004-1",
+   "start": 15.84,
+   "duration": 5.141,
+   "scene_type": "kit",
+   "grammar": "y5_kinetic_type",
+   "spec": {
+    "cues": [
+     {
+      "at": 0.06,
+      "kind": "point",
+      "text": "先看见情绪",
+      "sub": ""
+     },
+     {
+      "at": 2.33,
+      "kind": "point",
+      "text": "再说明规则，最后给他选择",
+      "sub": ""
+     },
+     {
+      "at": 3.69,
+      "kind": "highlight",
+      "data": {
+       "word": "再说明规"
+      }
+     }
+    ]
+   },
+   "narration_span": [
+    15.84,
+    20.981
+   ],
+   "subtitle_lines": [
+    "你能做的只有三件事：先看见情绪，再说明规则，最后给他选择。"
+   ],
+   "book_cover_required": false,
+   "assets": [],
+   "heavy_accent": false,
+   "_locked": false,
+   "theme": "wood",
+   "safe": {
+    "top": 80,
+    "bottom": 300
+   }
+  },
+  {
+   "id": "005-1",
+   "start": 20.981,
+   "duration": 4.6,
+   "scene_type": "kit",
+   "grammar": "bl_cover_hero",
+   "spec": {
+    "cues": [
+     {
+      "at": 0.06,
+      "kind": "cover",
+      "image": "images/cover-demo.jpg",
+      "text": "被讨厌的勇气",
+      "sub": "岸见一郎 / 古贺史健",
+      "data": {
+       "tag": "豆瓣 8.6",
+       "press": "机械工业出版社"
+      }
+     }
+    ]
+   },
+   "narration_span": [
+    20.981,
+    25.581
+   ],
+   "subtitle_lines": [
+    "这本书我放在橱窗了，想读的点开看看。"
+   ],
+   "book_cover_required": true,
+   "assets": [
+    {
+     "role": "book_cover",
+     "path": "images/cover-demo.jpg"
+    }
+   ],
+   "heavy_accent": false,
+   "_locked": false,
+   "theme": "wood",
+   "safe": {
+    "top": 80,
+    "bottom": 300
+   }
+  }
+ ]
+}

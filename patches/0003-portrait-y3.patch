@@ -1,0 +1,31 @@
+diff --git a/scripts/engine/clips/y3_whiteboard.js b/scripts/engine/clips/y3_whiteboard.js
+index a489f3a..4c1c914 100644
+--- a/scripts/engine/clips/y3_whiteboard.js
++++ b/scripts/engine/clips/y3_whiteboard.js
+@@ -65,7 +65,7 @@ function layout(ctx, f) {
+   const cues = ctx.cues, next = q => { const i = cues.indexOf(q); const n = cues.slice(i + 1).find(z => z.at > q.at + 1e-6); return n ? n.at : ctx.dur; };
+   const hasDraw = cues.some(q => q.kind === 'draw'), hasImg = cues.some(q => q.kind === 'image' && ctx.IMG[q.image]);
+   // 栏：横屏有图就左文右图；竖屏有 draw 时图标排在右侧窄栏、和它说的那条字并排（截图仍整宽）
+-  const S = (ctx.portrait ? 250 : 210) * u * f, gap = 70 * u * f;
++  const S = (ctx.portrait ? 200 : 210) * u * f, gap = (ctx.portrait ? 40 : 70) * u * f;   // 竖屏：图标栏窄一点、间距小一点，把宽度让给文字栏（250u 时文字栏只有 400px，9 个字折成两行）
+   const two = ctx.portrait ? hasDraw : (hasDraw || hasImg);
+   const colP = !two ? null : ctx.portrait ? { x: W - pad - S, w: S } : { x: W * 0.55, w: W * 0.45 - pad };
+   const nPt = cues.filter(q => q.kind === 'point').length, split = !ctx.portrait && !two && nPt >= 5 ? Math.ceil(nPt / 2) : 0;   // 横屏纯文字、要点 ≥5 条：分左右两栏写
+@@ -164,12 +164,15 @@ return {
+     if (p) { INK = p.ink; ORANGE = p.accent; WASH = PAL.alpha(p.accent, 0.22); BOARD = p.bg; } else { INK = '#0A0503'; ORANGE = '#EF7226'; WASH = 'rgba(239,114,38,.22)'; BOARD = '#FBFBFB'; }
+     band = { y0: safe.top, y1: H - safe.bottom }; band.h = band.y1 - band.y0;
+     // 字号系数 f 从 1.2 往下试：内容少就放大撑满版面，内容多就缩（最小 0.72），还放不下才让相机往下走
+-    let L; for (let f = 1.2; f >= 0.7; f -= 0.04) { L = layout(ctx, f); if (L.bottom + 70 * u <= band.y1) break; }   // 内容少就放大（最大 1.2）把版面撑满
++    let L; for (let f = (ctx.portrait ? 1.6 : 1.2); f >= 0.7; f -= 0.04) { L = layout(ctx, f); if (L.bottom + 70 * u <= band.y1) break; }   // 内容少就放大（横屏最大 1.2，竖屏 1.6：竖屏内容带窄而高，1.2 撑不满）
+     ({ B, items } = L);
+     OFF = [W + 140 * u, H + 280 * u];
+     lastEnd = Math.max(0, ...B.S.map(s => s.t1));
++    // 竖屏：内容比可用带矮时，把整块内容在带里垂直居中（只挪相机 y，不动版面）。
++    // 原来固定从 safe.top+240u 往下写，2–3 条内容时上半屏挤着、下半屏空一半（2026-10 竖屏实测下方死区 51%）。
++    const dy = ctx.portrait ? (band.y0 + band.y1) / 2 - (L.top + L.bottom) / 2 : 0;
+     // 相机：内容超出可用带就在下一条开写前平移过去（sineInOut）；最后有空就拉远看全图（只拉进 safe 带）
+-    keys = [{ t: 0, x: W / 2, y: H / 2, z: 1 }]; let cy = H / 2, panned = false;
++    keys = [{ t: 0, x: W / 2, y: H / 2 - dy, z: 1 }]; let cy = H / 2 - dy, panned = false;
+     for (const it of items) {
+       const need = it.y1 + 70 * u - (cy + band.y1 - H / 2); if (need <= 0) continue;
+       panned = true; cy += need + band.h * 0.12; const t1 = Math.max(keys[keys.length - 1].t + 0.2, it.q.at), t0 = Math.max(keys[keys.length - 1].t + 0.01, t1 - 0.6);

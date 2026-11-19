@@ -1,0 +1,20 @@
+{
+ "verdict": "yellow",
+ "red": [],
+ "yellow": [
+  "正文 90 字偏短（只够 ~21s；30s 以上建议 ≥120 字）"
+ ],
+ "info": {
+  "max_sentence": 25,
+  "avg_sentence": 18.0,
+  "written_words": [],
+  "you_per_100": 2.2,
+  "questions": 0,
+  "numbers_missing": [],
+  "chars": 90,
+  "sentences": 5,
+  "sources": [],
+  "min_coverage": 0.55
+ },
+ "coverage": []
+}

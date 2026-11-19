@@ -1,0 +1,15 @@
+diff --git a/scripts/engine/clips/t2_keynote_ui.js b/scripts/engine/clips/t2_keynote_ui.js
+index 2a37bd9..3a42271 100644
+--- a/scripts/engine/clips/t2_keynote_ui.js
++++ b/scripts/engine/clips/t2_keynote_ui.js
+@@ -240,7 +240,9 @@ function cardGeoImg(cd, ctx) { return { cx: ctx.W / 2, cy: G.cy, w: cd.box.w, h:
+ // 无图卡：横屏排一行（1 张时宽一点），竖屏叠成一列；total = 这一屏最终有几张（排版按当前张数，但尺寸上限按最终张数，挪位时不忽大忽小）
+ function rowGeo(j, n, ctx, total) {
+   const { W, u } = ctx, gap = 44 * u;
+-  if (ctx.portrait) { const w = W * 0.86, h = Math.min(400 * u, (G.bh - (total - 1) * gap) / total), y0 = G.cy - (n * h + (n - 1) * gap) / 2; return { cx: W / 2, cy: y0 + j * (h + gap) + h / 2, w, h }; }
++  // 竖屏：卡片上限从 400u 提到 560u。原来的 400u（=267px）在 720×1280 里两张卡只占 578px，内容带 820px，
++  // 上下各空一大块（2026-10 竖屏实测下方死区 35%）；按可用高度算、只留一个上限，1–3 张卡都能撑住内容带。
++  if (ctx.portrait) { const w = W * 0.86, h = Math.min(560 * u, (G.bh - (total - 1) * gap) / total), y0 = G.cy - (n * h + (n - 1) * gap) / 2; return { cx: W / 2, cy: y0 + j * (h + gap) + h / 2, w, h }; }
+   const w = total === 1 ? 760 * u : Math.min(540 * u, (W * 0.9 - (total - 1) * gap) / total), h = Math.min((ctx._stat ? 660 : 540) * u, G.bh * 0.9), x0 = W / 2 - (n * w + (n - 1) * gap) / 2;
+   return { cx: x0 + j * (w + gap) + w / 2, cy: G.cy, w, h };
+ }

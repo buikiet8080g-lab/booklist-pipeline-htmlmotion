@@ -1,0 +1,11 @@
+{
+ "method": "silencedetect",
+ "pause_db": -32,
+ "min_silence": 0.26,
+ "audio_seconds": 25.6,
+ "speech_spans": 15,
+ "captions": 5,
+ "covered_seconds": 25.21,
+ "chars": 104,
+ "chars_per_second": 4.12
+}

@@ -1,0 +1,99 @@
+diff --git a/scripts/engine/clips/bl_cover_hero.js b/scripts/engine/clips/bl_cover_hero.js
+new file mode 100644
+index 0000000..77ef8de
+--- /dev/null
++++ b/scripts/engine/clips/bl_cover_hero.js
+@@ -0,0 +1,93 @@
++// 片段 · 书单号书封主打（bl_cover_hero）：一镜只讲一本书。
++// 书封是转化资产，不是装饰：画面里这张图必须是 01 阶段核验过的真实封面文件（ctx.still 拿不到就报错，不出空白帧）。
++// 书封占主体：高按可用带的 68% 算、整张不裁（裁掉书名等于毁掉转化资产）；下面一句话＋作者名；可选角标。
++// cues：cover（一条，带 image）· 可选 text（一句话/副标题的落定时刻，不写＝cover.at + 0.5）
++//       data: { tag:'豆瓣 9.0'（右上角小角标，可选）, press:'机械工业出版社'（作者后面的出版社，可选）, fit:'contain'（默认，永远不裁） }
++// 镜头：书封从 0.96 升起落定 → 一句话升起 → 全程 1.5% 呼吸推进（scale 1.000→1.015）。
++// spec.theme：底 bg、书名 ink、作者 sub、角标与书脊线 accent；alpha 模式不画底。
++CLIPS.bl_cover_hero = (() => {
++const { clamp } = U;
++const SANS = 'PuHui-Bold', SANSB = 'PuHui-Black';
++const C0 = { bg: '#F3EDE2', ink: '#1B1A17', sub: '#6B655B', accent: '#C8402F', surface: '#FBF8F2' };
++let B = null, T = C0;
++return {
++  fonts: ['PuHui-Bold', 'PuHui-Black'],
++  kinds: ['cover', 'text'],                                                  // cue 白名单（clip.js 校验，见 patches/0006）
++  safe: true,
++  init(ctx) {
++    const { W, H, u, safe } = ctx, bx = ctx.box, bandH = bx.h;
++    const q = ctx.of('cover')[0];
++    T = ctx.pal ? { bg: ctx.pal.bg, ink: ctx.pal.ink, sub: ctx.pal.sub, acc: ctx.pal.accent, surface: ctx.pal.surface } : C0;
++    if (!q) throw new Error('bl_cover_hero：缺少 cover cue');
++    const im = ctx.still(q);
++    if (!im) throw new Error('bl_cover_hero：cover cue 没有可用的 book_cover 图片（必须是 01 阶段核验过的真实封面文件）');
++    const d = q.data || {}, [iw, ih] = MD.size(im), ar = iw / ih;
++    // 书封高度取可用带的 80%，但**先给下面的字留够**：书名可能折两行、作者/出版社一行。
++    // 原来把这块写死成 210u（140px），书名一折行，「岸见一郎」就掉进底部 300px 字幕区（lint D03 红）。
++    const g0 = document.createElement('canvas').getContext('2d');
++    const capW = bx.w - 60 * u, tSize = ctx.portrait ? 58 : 52, mSize = ctx.portrait ? 34 : 32;
++    const tFit = TY.fit(g0, q.text || '', capW, tSize, SANSB, { maxLines: 2, min: 0.62, balance: true });
++    const hasMeta = !!(q.sub || d.press);
++    const titleH = tFit.lines.length * tFit.size * 1.18, gapLM = hasMeta ? 26 * u : 0, metaH = hasMeta ? mSize * 1.35 : 0;
++    // 文字块的下沿锁在「内容带底 − 10u」（= 970），往上反推块顶，再往上放书封。
++    // 这样书名折 1 行还是 2 行都没关系，作者行永远不会落进 980 以下的字幕区（lint D03 一直卡这条）。
++    // 再让出 1.25×作者字号：TY.rise 入场时字从基线下方 1.2em 推上来，这段过程也不能压进字幕区
++    const ANIM = 1.25 * mSize;
++    const blockTop = bx.y + bandH - 10 * u - ANIM - (titleH + gapLM + metaH);
++    const capY = blockTop + tFit.size * 0.92;             // 书名第一行基线
++    const capH = titleH + gapLM + metaH;
++    let ch = Math.min(bandH * 0.80, blockTop - 24 * u - bx.y), cw = ch * ar;
++    const maxW = bx.w - (ctx.portrait ? 120 : 240) * u;
++    if (cw > maxW) { cw = maxW; ch = cw / ar; }
++    const coverBottom = blockTop - 24 * u;
++    let top = coverBottom - ch;
++    if (top < bx.y) { ch = Math.min(ch, coverBottom - bx.y); cw = ch * ar; top = bx.y; if (cw > maxW) { cw = maxW; ch = cw / ar; top = coverBottom - ch; } }
++    const lineAt = (ctx.of('text')[0] && ctx.of('text')[0].at) || (q.at + 0.5);
++    B = { q, d, im, iw, ih, ar, cw, ch, cx: W / 2, top, at: q.at, lineAt,
++      line: q.text || '', sub: q.sub || '', tag: d.tag || '', press: d.press || '',
++      capY, capW: bx.w - 60 * u, gapLM, mSize };
++  },
++  draw(c, t, ctx) {
++    const { W, H, u } = ctx; if (!B) return;
++    const pulse = 1 + 0.015 * clamp(ctx.lt(t, B.at) / Math.max(0.6, ctx.dur - B.at));   // 呼吸推进：t 的纯函数
++    if (!ctx.alpha) {
++      c.fillStyle = T.bg; c.fillRect(0, 0, W, H);
++      c.save(); c.globalAlpha = 0.05; c.fillStyle = T.ink;   // 竖纹底：两条低对比引导线，和 bl_quote 同一套语言
++      for (let i = 1; i <= 3; i++) c.fillRect(ctx.box.x + i * ctx.box.w / 4, ctx.box.y + 24 * u, 1.5 * u, ctx.box.h - 48 * u);
++      c.restore();
++    }
++    // 书封：从 0.96 升起（spring），落定后只保留呼吸；投影 + 书脊线，让它像一本立着的书而不是贴图
++    const sp = MO.spring(ctx.lt(t, B.at), { duration: 0.75, bounce: 0.16 }), s = (0.96 + 0.04 * sp) * pulse;
++    const cw = B.cw * s, ch = B.ch * s, x = B.cx - cw / 2, y = B.top + (B.ch - ch) / 2;
++    c.save(); c.globalAlpha = clamp(sp * 1.6);
++    c.shadowColor = 'rgba(0,0,0,0.30)'; c.shadowBlur = 44 * u; c.shadowOffsetY = 16 * u;
++    c.fillStyle = '#000'; c.fillRect(x + 6 * u, y + 4 * u, cw, ch); c.shadowColor = 'transparent';
++    c.drawImage(B.im, x, y, cw, ch);
++    // 书脊：左侧一条 accent 压边 + 一道浅高光，让厚度看得出来
++    c.fillStyle = 'rgba(0,0,0,0.22)'; c.fillRect(x, y, Math.max(3 * u, cw * 0.028), ch);
++    c.fillStyle = 'rgba(255,255,255,0.16)'; c.fillRect(x + Math.max(3 * u, cw * 0.028), y, Math.max(1.5 * u, cw * 0.008), ch);
++    c.restore();
++    // 角标：右上角，落在书封右边线的外侧（不压封面上的字）
++    if (B.tag) {
++      const tp = ctx.p(t, B.at + 0.75, 0.4), tf = TY.fit(c, B.tag, B.cw * 0.9, ctx.portrait ? 32 : 30, SANS, { maxLines: 1, min: 0.7 });
++      if (tp > 0) {
++        const tw = TY.width(c, tf.lines[0], tf.size, SANS) + 34 * u, th = tf.size * 1.9, tx = x + cw - tw, ty = Math.max(ctx.box.y + 8 * u, y - th - 14 * u);
++        c.save(); c.globalAlpha = clamp(tp); c.fillStyle = T.acc; c.beginPath(); c.roundRect(tx, ty, tw, th, th / 2); c.fill(); c.restore();
++        TY.rise(c, tf.lines[0], tx + 17 * u, ty + th * 0.68, tp, { size: tf.size, fam: SANS, color: ctx.alpha ? '#111' : PAL.on(T.acc, [T.surface, T.bg, T.ink]), align: 'left' });
++      }
++    }
++    // 一句话：书名（大）＋作者/出版社（小）；放不下先缩字号、再折两行，绝不截断
++    if (B.line) {
++      const lf = TY.fit(c, B.line, B.capW, ctx.portrait ? 58 : 52, SANSB, { maxLines: 2, min: 0.62, balance: true });
++      const lp = ctx.p(t, B.lineAt, 0.4);
++      lf.lines.forEach((ln, i) => TY.rise(c, ln, W / 2, B.capY + i * lf.size * 1.18, ctx.p(t, B.lineAt + i * 0.1, 0.4), { size: lf.size, fam: SANSB, color: T.ink, align: 'center', ...(ctx.alpha ? { stroke: '#111', strokeW: lf.size * 0.05 } : {}) }));
++      const meta = [B.sub, B.press].filter(Boolean).join(' · ');
++      if (meta) {
++        const mf = TY.fit(c, meta, B.capW, ctx.portrait ? 34 : 32, SANS, { maxLines: 2, min: 0.8, balance: true });
++        // 作者行基线 = 书名首行基线 + (书名行数−1) 行高 + 行间距 + 作者字号的 0.92
++        TY.rise(c, mf.lines[0], W / 2, B.capY + (lf.lines.length - 1) * lf.size * 1.18 + B.gapLM + B.mSize * 0.92, ctx.p(t, B.lineAt + 0.22, 0.4), { size: mf.size, fam: SANS, color: T.sub, align: 'center', ...(ctx.alpha ? { stroke: '#111', strokeW: mf.size * 0.06 } : {}) });
++      }
++    }
++  },
++};
++})();

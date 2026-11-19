@@ -1,0 +1,53 @@
+{
+ "pipeline": "booklist-pipeline-htmlmotion",
+ "theme": "wood",
+ "account": "/root/.pi/agent/skills/booklist-pipeline-htmlmotion/accounts/family-education-parent-reader.md",
+ "script": "02-final-script.md",
+ "cover": "",
+ "stages": [
+  {
+   "stage": "03 内容审核",
+   "seconds": 0.0,
+   "ok": true,
+   "cmd": "/usr/bin/python3 /root/.pi/agent/skills/booklist-pipeline-htmlmotion/ours/audit_script.py --script 02-final-script.md --book 被讨厌的勇气 --out 03-script-audit.md --json metadata/03-script-audit.json --min-coverage 0.55"
+  },
+  {
+   "stage": "04 配音",
+   "seconds": 9.3,
+   "ok": true,
+   "cmd": "/usr/bin/python3 /root/.pi/agent/skills/booklist-pipeline-htmlmotion/ours/tts_mimo.py --script 02-final-script.md --out /root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/audio/main-voice.wav --account /root/.pi/agent/skills/booklist-pipeline-htmlmotion/accounts/family-education-parent-reader.md"
+  },
+  {
+   "stage": "05 分镜",
+   "seconds": 0.1,
+   "ok": true,
+   "cmd": "/usr/bin/python3 /root/.pi/agent/skills/booklist-pipeline-htmlmotion/ours/shot_plan.py --script 02-final-script.md --audio /root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/audio/main-voice.wav --book metadata/book-assets.json --theme wood --out metadata/plan.json --markdown 05-shot-plan.md --account /root/.pi/agent/skills/booklist-pipeline-htmlmotion/accounts/family-education-parent-reader.md"
+  },
+  {
+   "stage": "lint 闸门",
+   "seconds": 5.1,
+   "ok": true,
+   "cmd": "/usr/bin/python3 /root/.pi/agent/skills/booklist-pipeline-htmlmotion/ours/lint_spec.py metadata/plan.json"
+  },
+  {
+   "stage": "07 渲染",
+   "seconds": 16.0,
+   "ok": true,
+   "cmd": "/usr/bin/python3 /root/.pi/agent/skills/booklist-pipeline-htmlmotion/ours/render_batch.py metadata/plan.json --workspace . --parallel 3"
+  },
+  {
+   "stage": "08a 字幕对齐",
+   "seconds": 0.2,
+   "ok": true,
+   "cmd": "/usr/bin/python3 /root/.pi/agent/skills/booklist-pipeline-htmlmotion/ours/align_subtitles.py --audio /root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/audio/main-voice.wav --script 02-final-script.md --out metadata/captions.json"
+  },
+  {
+   "stage": "08 收尾",
+   "seconds": 4.3,
+   "ok": true,
+   "cmd": "/usr/bin/python3 /root/.pi/agent/skills/booklist-pipeline-htmlmotion/ours/assemble.py metadata/plan.json --workspace . --video render/master-noaudio.mp4 --audio /root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/audio/main-voice.wav --captions metadata/captions.json --account /root/.pi/agent/skills/booklist-pipeline-htmlmotion/accounts/family-education-parent-reader.md"
+  }
+ ],
+ "final": "/root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/final/发布版-family-education-parent-reader-wood.mp4",
+ "finished_at": "2026-10-30T01:13:50"
+}

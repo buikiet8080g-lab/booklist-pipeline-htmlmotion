@@ -1,0 +1,45 @@
+diff --git a/scripts/engine/clips/y2_vox.js b/scripts/engine/clips/y2_vox.js
+index 86c516a..784dbcc 100644
+--- a/scripts/engine/clips/y2_vox.js
++++ b/scripts/engine/clips/y2_vox.js
+@@ -1,6 +1,7 @@
+ // 片段 · Vox 式拼贴（y2）：一张大桌面＝世界，素材按出场顺序摆在桌上、红线连起来；相机 60fps 平滑追过去，
+ // 桌上的东西（滑入、荧光笔、红圈、打字）按 12fps「一拍二」步进。
+ // cues：image | clip（截图/照片/剪报：image 路径，或 frames 录像帧序列；冲印件（白边、旧纸色、胶带，MD.print）；text 可选＝压在左下角的黑底撕边标签（12fps 打字）；
++//              data.tape:false 不画胶带（竖屏精简模式，能省一点逐帧开销）；
+ //              data.halftone:true 转成灰度网点，默认保留原色；data.fit:'cover' 按 data.focus=[fx,fy] 裁成 data.aspect（默认 16:9 / 竖屏 4:5）满框，默认等比不裁；at 这一帧开始滑入）
+ //       title（Borders 式黑底白字标签条，打字 13 字/秒）· point（横线索引卡，打字）
+ //       highlight（当前这张图上 data.rect=[x,y,w,h]（0..1，相对图片）：at 起荧光笔扫过 → 红笔圈住 → 相机推近那一块）
+@@ -46,6 +47,13 @@ return {
+       const it = { q, kind, x, y, w, h, rot: (r() - 0.5) * 0.07, lines, size, seed: 11 + items.length * 7 };
+       items.push(it); prev = it; cur++;
+     }
++    // 竖屏：整条桌面链在内容框 [safe.top, H−safe.bottom] 里垂直居中。链是按 H/2 往下一件件排的，
++    // 件数少时整块会坐在上半屏、下半屏空掉一半（2026-10 竖屏实测：2 件时下方死区 45%）。只挪 y，不挪 x。
++    if (portrait && items.length) {
++      const top0 = Math.min(...items.map(it => it.y - it.h / 2)), bot0 = Math.max(...items.map(it => it.y + it.h / 2));
++      const want = ctx.safe.top + (H - ctx.safe.top - ctx.safe.bottom) / 2, dy = want - (top0 + bot0) / 2;
++      items.forEach(it => { it.y += dy; });
++    }
+     // 文字卡的打字速度与「读完」时刻：默认 13 字/秒；离下一件太近就提速（最多 40 字/秒），保证相机走之前打完、再停 0.5s 让人读完
+     items.forEach((it, i) => {
+       if (it.kind === 'image') { it.done = it.q.at + 0.6; return; }
+@@ -60,7 +68,8 @@ return {
+       const pts = CL.stringPts(pa, pb, 0.06); return { a: pa, b: pb, pts, cum: DG.cum(pts), at: b.q.at }; });
+     // 相机关键帧：每件到场前 ≈0.9s 起追过去（长尾），在它的 at 之前落定；高亮时推近那一块
+     const Hs = H - ctx.safe.top - ctx.safe.bottom;                           // 让开字幕带后的可用高度；画面中心同步下移/上移（draw 里平移）
+-    const zFor = it => it.kind === 'image' ? clamp(Math.min(W * 0.9 / it.w, Hs * 0.86 / it.h), 0.5, 2.4) : clamp(Math.min(W * 0.82 / it.w, Hs * 0.8 / it.h), 0.5, 1.6);   // 照片撑满画面，文字卡别放太大
++    // 照片撑满画面，但整张冲印件（含白边）必须留在内容带里：高按 Hs−12u 算，竖屏不再出现顶边被裁掉一截（2026-10 实测）
++    const zFor = it => it.kind === 'image' ? clamp(Math.min(W * 0.9 / it.w, (Hs - 12 * u) / it.h), 0.5, 2.4) : clamp(Math.min(W * 0.82 / it.w, Hs * 0.8 / it.h), 0.5, 1.6);
+     keys = []; let last = null;
+     const snap = (ctx.data && ctx.data.camera) === 'snap', MV = snap ? { next: MO.PULSE.pan, in: MO.PULSE.punch, ease: MO.cubicInOut } : { next: MO.PULSE.glide, in: MO.PULSE.push, ease: MO.sineInOut };
+     const hls = ctx.of('highlight');
+@@ -121,7 +130,7 @@ function drawItem(g, it, t, ctx) {
+     const f = imgBox(it, u), fr = ctx.frame(q, t), cov = q.data && q.data.fit === 'cover', fo = (q.data && q.data.focus) || [0.5, 0.5];
+     let src = fr;
+     if (q.data && q.data.halftone) { const hs = PAINT.canvas(Math.round(f.w), Math.round(f.h)); MD.cover(hs.getContext('2d'), fr, { x: 0, y: 0, w: hs.width, h: hs.height, fit: cov ? 'cover' : 'contain', fx: fo[0], fy: fo[1] }); src = CL.halftone('clipimg' + it.seed + (q.frames ? '_' + Math.floor((t - q.at) * (q.fps || 30)) : ''), hs, { cell: 5 * u, contrast: 1.25 }); }
+-    MD.print(g, src, f.w, f.h, { border: 16 * u, fx: fo[0], fy: fo[1], tape: true, key: q.frames ? null : 'y2print' + it.seed });   // 冲印件：白边、旧纸色、投影、胶带
++    MD.print(g, src, f.w, f.h, { border: 16 * u, fx: fo[0], fy: fo[1], tape: q.data ? q.data.tape !== false : true, key: q.frames ? null : 'y2print' + it.seed });   // 冲印件：白边、旧纸色、投影、胶带；data.tape:false 去掉胶带（精简模式，逐帧少画两片半透明纸）
+     if (q.text) { const fs = TY.fit(g, q.text, w * 0.8, 40 * u, 'PuHui-Heavy', { maxLines: 1, min: 0.5 });   // 黑底撕边标签压在左下角，12fps 打字
+       MD.label(g, q.text, -w / 2 - 14 * u, h / 2 - 34 * u, { t, at: q.at + 0.25, size: fs.size, r: -0.02, bg: C.ink, fg: C.paper }); }
+     // 高亮：荧光笔（multiply，一拍二扫过）→ 红笔圈

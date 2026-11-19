@@ -1,0 +1,1 @@
+{"grammar": "y5_kinetic_type", "duration": 5.141, "fps": 24, "width": 720, "height": 1280, "theme": "wood", "safe": {"top": 80, "bottom": 300}, "data": {}, "cues": [{"at": 0.06, "kind": "point", "text": "先看见情绪", "sub": ""}, {"at": 2.33, "kind": "point", "text": "再说明规则，最后给他选择", "sub": ""}, {"at": 3.69, "kind": "highlight", "data": {"word": "再说明规"}}]}

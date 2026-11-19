@@ -1,0 +1,1 @@
+# 04 主音轨\n\n- 音色：茉莉（family-moli-reflective-seeding-v1）\n- 文案：108 字 / 1 段\n- 成轨：`/root/.pi/agent/skills/booklist-pipeline-htmlmotion/samples/t21-30s/audio/main-voice.wav` · **25.60s**\n- 生成耗时：9s（并发 3）\n
