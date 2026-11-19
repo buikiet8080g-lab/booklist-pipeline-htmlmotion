@@ -140,7 +140,7 @@ python3 <skill>/ours/assemble.py metadata/plan.json --workspace . --account <ski
 | T17 patch 可重放 | ✓ 从 `git archive HEAD` 的干净副本重放 6 个 patch，与原工作树 `diff -r` 一致 |
 | T18 风格配方不越界 | ✓ 全片 spec 无 `recipe/style_recipe/scenes`（`lint` E11）；第一期不使用风格配方 |
 | T19 账号风格一致 | ⚠ 两个账号已建档（`wood` / `paper` + 字幕样式），连续 3 条片的对比未做 |
-| T20 环境自检 | ✓ `ours/env_check.py` 11/11 |
+| T20 环境自检 | ✓ `ours/env_check.py` 全项通过（`vendor/` 无嵌套 `.git` 时为降级提示，不影响渲染） |
 | T21 | ✓ 见上 |
 
 ## 七、机器可读 marker（产物里照抄）

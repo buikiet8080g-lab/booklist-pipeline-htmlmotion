@@ -12,7 +12,7 @@ def run(cmd, **kw):
 
 
 def main() -> int:
-    checks = []
+    checks, warns = [], []
     py = sys.version.split()[0]
     checks.append(("python ≥3.10", tuple(map(int, py.split(".")[:2])) >= (3, 10), py))
     checks.append(("ffmpeg", shutil.which("ffmpeg") is not None, (run(["ffmpeg", "-version"]).stdout.splitlines() or [""])[0][:40]))
@@ -39,7 +39,9 @@ def main() -> int:
         checks.append(("vendor tag = v1.2.0", tag == "v1.2.0", tag or "?"))
         checks.append(("vendor 改动只来自 patches", len(st) <= 11, f"{len(st)} 个文件被改（0=未 apply；11=6 个 patch 全 apply）"))
     else:
-        checks.append(("vendor 是 git 工作树", False, "见 vendor/BASELINE.md 离线副本做法"))
+        # 从 GitHub / ZIP 安装的副本不带 vendor 的嵌套 .git（见 vendor/BASELINE.md「离线副本」），
+        # 属正常情况：只提示校验降级，不算失败。
+        warns.append(("vendor 无 .git", "跳过 tag/改动校验（GitHub/ZIP 安装正常）；需要严格校验见 vendor/BASELINE.md"))
     eng = VENDOR / "scripts" / "engine"
     size = sum(p.stat().st_size for p in eng.rglob("*") if p.is_file()) / 1e6 if eng.exists() else 0
     checks.append(("scripts/engine ≈24M", 20 <= size <= 30, f"{size:.0f}M"))
@@ -49,8 +51,11 @@ def main() -> int:
     checks.append(("系统中文字体", len(zh) >= 1, f"{len(zh)} 条（字幕烧录用 WenQuanYi Zen Hei）"))
     for name, ok, detail in checks:
         print(f"{'✓' if ok else '✗'} {name}：{detail}")
+    for name, detail in warns:
+        print(f"⚠ {name}：{detail}")
     bad = [c for c in checks if not c[1]]
-    print(f"{'✓' if not bad else '✗'} env_check：{len(checks)-len(bad)}/{len(checks)} 通过")
+    print(f"{'✓' if not bad else '✗'} env_check：{len(checks)-len(bad)}/{len(checks)} 通过"
+          + (f"（{len(warns)} 条降级提示）" if warns else ""))
     return 1 if bad else 0
 
 

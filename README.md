@@ -39,6 +39,18 @@ ls final/        # 发布版-*.mp4
 | `samples/t21-30s/` | **T21 30 秒样例**：成片、plan、manifest、lint 结论 |
 | `assets/fonts/` | NotoSansSC ×4 + NotoSerifSC（引文实际用 vendor 的 `LXGWWenKai-500`） |
 
+## 从 GitHub 安装 / 更新
+
+```bash
+git clone --depth 1 https://github.com/buikiet8080g-lab/booklist-pipeline-htmlmotion.git \
+  ~/.pi/agent/skills/booklist-pipeline-htmlmotion
+```
+
+也可以直接在 GitHub 页面 **Code → Download ZIP**，解压后放到 `~/.pi/agent/skills/booklist-pipeline-htmlmotion`。
+
+- 本仓库的 `vendor/huashu-art-motion/` 是**去掉嵌套 `.git` 的完整源码副本**（144M → 92M），开箱即可渲染，无需联网拉上游。
+- 因此 `ours/env_check.py` 会把「vendor 无 .git」列为降级提示（⚠），不算失败；需要严格校验 tag/改动时按 `vendor/BASELINE.md`「离线副本」重新 `git init`。
+
 ## vendor 基线
 
 | 项 | 值 |
